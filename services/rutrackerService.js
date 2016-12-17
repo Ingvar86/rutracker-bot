@@ -8,7 +8,7 @@ var request = require('request'),
 
 function Rutracker(url) {
     var event = new EventEmitter();
-    this.fetchData = function() {
+    this.fetch = function() {
         request({url: url, encoding: null}, function (error, response, body) {
             if (!error) {
                 var body1 = iconv.decode(body, 'win1251');
@@ -46,8 +46,8 @@ function Rutracker(url) {
     };
 
     this.start = function(interval) {
-        this.fetchData();
-        setInterval(this.fetchData, interval);         
+        this.fetch();
+        setInterval(this.fetch, interval);         
     };
 
     this.on = function(name, callback) {

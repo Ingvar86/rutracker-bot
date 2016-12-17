@@ -4,9 +4,16 @@ var chatSetvice = require('../services/chatService');
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.BOT_TOKEN;
-
+var bot;
 // Create a bot that uses 'polling' to fetch new updates
-var bot = new TelegramBot(token, { polling: true });
+if(process.env.NODE_ENV === 'production') {
+    bot = new TelegramBot(token);
+    bot.setWebHook(process.env.HEROKU_URL + bot.token);
+}
+else {
+    bot = new TelegramBot(token, { polling: true });
+}
+
 // temporary
 
 // Matches "/start"

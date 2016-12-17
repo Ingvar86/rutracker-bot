@@ -5,7 +5,7 @@ var Rutracker = require('../services/rutrackerService'),
 describe.skip('Test Rutracker Service', function() {
     var rutracker = new Rutracker(url);
     it('should return topics from ' + url, function(done) {
-        rutracker.fetchData((data) => {
+        rutracker.fetch((data) => {
             data.should.be.Array();
             data.length.should.be.above(0);
             data[0].should.have.properties(['title', 'href', 'date']);
