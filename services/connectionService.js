@@ -21,3 +21,9 @@ exports.getConnection = function() {
         }
     });  
 };
+
+exports.closeConnection = function() {
+    if (database) {
+        database.close();
+    }
+};

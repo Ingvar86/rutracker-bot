@@ -18,5 +18,6 @@ app.post('/' + bot.token, function (req, res) {
 });
 
 app.listen(port, function () {
+    bot.setWebHook(process.env.HEROKU_URL + bot.token);
     console.log('Web server started at port: ', port);
 });

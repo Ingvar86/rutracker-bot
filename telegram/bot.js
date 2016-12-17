@@ -8,7 +8,6 @@ var bot;
 // Create a bot that uses 'polling' to fetch new updates
 if(process.env.NODE_ENV === 'production') {
     bot = new TelegramBot(token);
-    bot.setWebHook(process.env.HEROKU_URL + bot.token);
 }
 else {
     bot = new TelegramBot(token, { polling: true });
@@ -50,7 +49,7 @@ bot.onText(/\/end/, function (msg, match) {
 // });
 
 bot.notifyAll = function (massage) {
-    chatSetvice.getChats().then(chats => {
+    return chatSetvice.getChats().then(chats => {
         chats.forEach((chat) => {
             bot.sendMessage(chat.chatId, massage);
         });
