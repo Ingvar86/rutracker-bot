@@ -1,7 +1,7 @@
 var request = require('request'),
     cheerio = require('cheerio'),
     iconv = require('iconv-lite'),
-    dateService = require('./dateService'),
+    topicService = require('./topicService'),
     EventEmitter = require('events'),
     baseUrl = 'http://rutracker.org/forum/';
 
@@ -21,24 +21,25 @@ function Rutracker(url) {
                         let a = elem.find('a.torTopic');
                         let title = a.text();
                         let href = a.attr('href');
-                        let date = new Date(elem.find('p').eq(2).text());
-                        topicsArray.push({title: title, href: baseUrl + href, date: date});
+                        topicsArray.push({title: title, href: baseUrl + href});
                     }
                     event.emit('data', topicsArray);
-                    dateService.getDate().then(result =>{
+                    topicService.getTopics().then(result =>{
                         let filtered = [];
                         if (result) {
-                            let date = result.date;
+                            let oldTopics = result.topics;
                             filtered = topicsArray.filter((elem) => {
-                                return elem.date > date;
+                                return !oldTopics.find(old => {
+                                    return old.href === elem.href;
+                                });
                             });
                             if (filtered.length > 0) {
                                 event.emit('update', filtered);
-                                dateService.setDate(filtered[0].date);
+                                topicService.setTopics(topicsArray);
                             }
                         }
                         else {
-                            dateService.setDate(topicsArray[0].date);
+                            topicService.setTopics(topicsArray);
                         }
                         resolve(filtered);
                     });
