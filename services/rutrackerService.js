@@ -4,7 +4,7 @@ var request = require('request'),
     iconv = require('iconv-lite'),
     topicService = require('./topicService'),
     EventEmitter = require('events'),
-    baseUrl = 'http://rutracker.org/forum/';
+    baseUrl = 'http://rutracker.org/forum/',
     rutracker_cookie = process.env.RUTRACKER_COOKIE;
 
 
