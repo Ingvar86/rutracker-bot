@@ -1,20 +1,29 @@
+'use strict';
 var request = require('request'),
     cheerio = require('cheerio'),
     iconv = require('iconv-lite'),
     topicService = require('./topicService'),
     EventEmitter = require('events'),
     baseUrl = 'http://rutracker.org/forum/';
+    rutracker_cookie = process.env.RUTRACKER_COOKIE;
 
 
 function Rutracker(url) {
     var event = new EventEmitter();
     this.fetch = function() {
         return new Promise((resolve, reject) => {
-            request({url: url, encoding: null}, function (error, response, body) {
+            const options = {
+                url: url,
+                encoding: null,
+                headers: {
+                    'Cookie': 'bb_data=' + rutracker_cookie + '; opt_js={"only_new":2}'
+                }
+            };
+            request(options, function (error, response, body) {
                 if (!error) {
                     var body1 = iconv.decode(body, 'win1251');
                     var $ = cheerio.load(body1),
-                        topics = $('.forum  tr:has(td:contains("Темы")) ~ tr[class="hl-tr"]'),
+                        topics = $('tr[class="hl-tr"]'),
                         topicsArray = [];
                     for (let i = 0; i < topics.length; i++){
                         let elem = topics.eq(i);
