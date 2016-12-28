@@ -1,13 +1,25 @@
 var connect = require('../services/connectionService');
 
-exports.getTopics = function() {        
+exports.checkTopics = function(topicsArray) {        
     return connect.getConnection().then((db) => {
-        return db.collection('topics').findOne();
+        const collection = db.collection('topics');
+        var promises = [];
+        topicsArray.forEach((topic) => {
+            var promise = collection.findOne({href: topic.href}).then((result) => {
+                console.log('findOne result: ' + result);
+                if (!result) {
+                    return Promise.resolve(topic);
+                }
+            });
+            promises.push(promise);
+            return;
+        });
+        return Promise.all(promises);
     });
 };
 
-exports.setTopics = function(topics) {
+exports.addTopics = function(topics) {
     return connect.getConnection().then((db) => {
-        return db.collection('topics').findOneAndUpdate({}, {$set: {topics: topics, date: new Date()}}, {upsert: true});
+        return db.collection('topics').insertMany(topics);
     });
 };
