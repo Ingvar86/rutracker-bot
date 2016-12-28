@@ -3,18 +3,19 @@ var connect = require('../services/connectionService');
 exports.checkTopics = function(topicsArray) {        
     return connect.getConnection().then((db) => {
         const collection = db.collection('topics');
-        var promises = [];
-        topicsArray.forEach((topic) => {
-            var promise = collection.findOne({href: topic.href}).then((result) => {
-                console.log('findOne result: ' + result);
+        const promises = topicsArray.map((topic) => {
+            return collection.findOne({href: topic.href}).then((result) => {
+                console.log('findOne result: ' + result ? result.href : null);
                 if (!result) {
-                    return Promise.resolve(topic);
-                }
+                    return topic;
+                }                
             });
-            promises.push(promise);
-            return;
         });
-        return Promise.all(promises);
+        return Promise.all(promises).then((result) => {
+            return result.filter(topic => {
+                return !!topic;
+            });
+        });
     });
 };
 
