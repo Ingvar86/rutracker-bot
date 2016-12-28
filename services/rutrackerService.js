@@ -34,47 +34,45 @@ Rutracker.prototype.login = function(user, password) {
 
 Rutracker.prototype.fetch = function() {
     const me = this;
-    const options = {
-        url: me.url,
-        encoding: null,
-        headers: {
-            'Cookie': me.cookie + '; opt_js={"only_new":2}'
-        }
-    };
-    request(options, function (error, response, body) {
-        if (!error) {
-            var body1 = iconv.decode(body, 'win1251');
-            var $ = cheerio.load(body1),
-                topics = $('tr[class="hl-tr"]'),
-                topicsArray = [];
-            for (let i = 0; i < topics.length; i++){
-                let elem = topics.eq(i);
-                let a = elem.find('a.torTopic');
-                let title = a.text();
-                let href = a.attr('href');
-                topicsArray.push({title: title, href: baseUrl + href});
+    return new Promise((resolve, reject) => {
+        const options = {
+            url: me.url,
+            encoding: null,
+            headers: {
+                'Cookie': me.cookie + '; opt_js={"only_new":2}'
             }
-            console.log('topicsArray: ' + topicsArray);
-            me.emit('data', topicsArray);
-            topicService.checkTopics(topicsArray).then(result => {
-                console.log('new topics: ' + result);
-                if (result && result.length > 0) {
-                    topicService.addTopics(result);
-                    me.emit('update', result);
+        };
+        request(options, function (error, response, body) {
+            if (!error) {
+                var body1 = iconv.decode(body, 'win1251');
+                var $ = cheerio.load(body1),
+                    topics = $('tr[class="hl-tr"]'),
+                    topicsArray = [];
+                for (let i = 0; i < topics.length; i++){
+                    let elem = topics.eq(i);
+                    let a = elem.find('a.torTopic');
+                    let title = a.text();
+                    let href = a.attr('href');
+                    topicsArray.push({title: title, href: baseUrl + href});
                 }
-                else {
-                    topicService.setTopics(topicsArray);
-                }
-            });
-        } else {
-            console.log('Error: ' + error);
-        }
-    }); 
-};
-
-Rutracker.prototype.start = function(interval) {
-    this.fetch();
-    setInterval(this.fetch, interval);         
+                console.log('topicsArray: ' + topicsArray);
+                topicService.checkTopics(topicsArray).then(result => {
+                    console.log('new topics: ' + result);
+                    if (result && result.length > 0) {
+                        topicService.addTopics(result).then(() => {
+                            resolve(result);
+                        });
+                    }
+                    else {
+                        resolve(result);
+                    }
+                });
+            } else {
+                reject(error);
+                console.log('Error: ' + error);
+            }
+        }); 
+    });
 };
 
 module.exports = Rutracker;
