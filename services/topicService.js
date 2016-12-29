@@ -5,7 +5,7 @@ exports.checkTopics = function(topicsArray) {
         const collection = db.collection('topics');
         const promises = topicsArray.map((topic) => {
             return collection.findOne({href: topic.href}).then((result) => {
-                console.log('findOne result: ' + result ? result.href : null);
+                console.log('findOne result: ' + JSON.stringify(result));
                 if (!result) {
                     return topic;
                 }                

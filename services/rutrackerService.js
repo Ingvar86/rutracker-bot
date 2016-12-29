@@ -55,9 +55,9 @@ Rutracker.prototype.fetch = function() {
                     let href = a.attr('href');
                     topicsArray.push({title: title, href: baseUrl + href});
                 }
-                console.log('topicsArray: ' + topicsArray);
+                console.log('topicsArray: ' + JSON.stringify(topicsArray));
                 topicService.checkTopics(topicsArray).then(result => {
-                    console.log('new topics: ' + result);
+                    console.log('new topics: ' + JSON.stringify(result));
                     if (result && result.length > 0) {
                         topicService.addTopics(result).then(() => {
                             resolve(result);
