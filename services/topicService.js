@@ -1,11 +1,12 @@
-var connect = require('../services/connectionService');
+var connect = require('../services/connectionService'),
+    winston = require('winston');
 
 exports.checkTopics = function(topicsArray) {        
     return connect.getConnection().then((db) => {
         const collection = db.collection('topics');
         const promises = topicsArray.map((topic) => {
             return collection.findOne({href: topic.href}).then((result) => {
-                console.log('findOne result: ' + JSON.stringify(result));
+                winston.debug('findOne result: ' + JSON.stringify(result));
                 if (!result) {
                     return topic;
                 }                

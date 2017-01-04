@@ -1,15 +1,19 @@
 'use strict';
 var Rutracker = require('./services/rutrackerService'),
+    topicService = require('./topicService'),
+    winston = require('winston'),
     bot = require('./telegram/bot'),
     connectionService = require('./services/connectionService'),
     url = 'http://rutracker.org/forum/viewforum.php?f=257',
     user = process.env.USER,
     password = process.env.PASSWORD;
 
-var rutracker = new Rutracker(user, password, url);
+winston.level = process.env.DEBUG_LEVEL || 'info';
+
+var rutracker = new Rutracker(topicService);
 
 rutracker.on('login', () => {
-    rutracker.fetch().then((newTopics) => {
+    rutracker.fetch(url).then((newTopics) => {
         if (newTopics && newTopics.length >0) {
             var message = newTopics.reduce((prev, next) => {
                 return prev + next.title + '\n' + next.href + '\n'; 
@@ -21,5 +25,12 @@ rutracker.on('login', () => {
         else {
             connectionService.closeConnection();        
         }
+    }).catch(error => {
+        connectionService.closeConnection();
+        winston.error(error);
     });
 });
+
+rutracker.on('login-error', winston.error);
+
+rutracker.login(user, password);

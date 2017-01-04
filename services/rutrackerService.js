@@ -2,16 +2,13 @@
 var request = require('request'),
     cheerio = require('cheerio'),
     iconv = require('iconv-lite'),
-    topicService = require('./topicService'),
+    winston = require('winston'),
     EventEmitter = require('events'),
     baseUrl = 'http://rutracker.org/forum/',
     loginUrl = baseUrl + 'login.php';
 
-function Rutracker(user, password, url) {
-    this.user = user;
-    this.password = password;
-    this.url = url;
-    this.login(user, password);
+function Rutracker(topicService) {
+    this.topicService = topicService;
 }
 
 Rutracker.prototype = new EventEmitter();
@@ -27,16 +24,21 @@ Rutracker.prototype.login = function(user, password) {
         }
     };
     request.post(options, function (error, response, body) {
-        me.cookie = response.headers['set-cookie'][0];
-        me.emit('login');
+        if (error) {
+            me.emit('login-error', error);
+        }
+        else {
+            me.cookie = response.headers['set-cookie'][0];
+            me.emit('login');
+        }
     });    
 };
 
-Rutracker.prototype.fetch = function() {
+Rutracker.prototype.fetch = function(url) {
     const me = this;
     return new Promise((resolve, reject) => {
         const options = {
-            url: me.url,
+            url: url,
             encoding: null,
             headers: {
                 'Cookie': me.cookie + '; opt_js={"only_new":2}'
@@ -55,21 +57,20 @@ Rutracker.prototype.fetch = function() {
                     let href = a.attr('href');
                     topicsArray.push({title: title, href: baseUrl + href});
                 }
-                console.log('topicsArray: ' + JSON.stringify(topicsArray));
-                topicService.checkTopics(topicsArray).then(result => {
-                    console.log('new topics: ' + JSON.stringify(result));
+                winston.debug('topicsArray: ' + JSON.stringify(topicsArray));
+                me.topicService.checkTopics(topicsArray).then(result => {
+                    winston.debug('new topics: ' + JSON.stringify(result));
                     if (result && result.length > 0) {
-                        topicService.addTopics(result).then(() => {
+                        me.topicService.addTopics(result).then(() => {
                             resolve(result);
-                        });
+                        }).catch(reject);
                     }
                     else {
                         resolve(result);
                     }
-                });
+                }).catch(reject);
             } else {
                 reject(error);
-                console.log('Error: ' + error);
             }
         }); 
     });
