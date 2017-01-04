@@ -1,6 +1,6 @@
 'use strict';
 var Rutracker = require('./services/rutrackerService'),
-    topicService = require('./topicService'),
+    topicService = require('./services/topicService'),
     winston = require('winston'),
     bot = require('./telegram/bot'),
     connectionService = require('./services/connectionService'),
