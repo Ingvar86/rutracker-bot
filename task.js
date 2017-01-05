@@ -1,6 +1,5 @@
 'use strict';
 var Rutracker = require('./services/rutrackerService'),
-    topicService = require('./services/topicService'),
     winston = require('winston'),
     bot = require('./telegram/bot'),
     connectionService = require('./services/connectionService'),
@@ -10,11 +9,11 @@ var Rutracker = require('./services/rutrackerService'),
 
 winston.level = process.env.DEBUG_LEVEL || 'info';
 
-var rutracker = new Rutracker(topicService);
+var rutracker = new Rutracker();
 
 rutracker.on('login', () => {
     rutracker.fetch(url).then((newTopics) => {
-        if (newTopics && newTopics.length >0) {
+        if (newTopics && newTopics.length > 0) {
             var message = newTopics.reduce((prev, next) => {
                 return prev + next.title + '\n' + next.href + '\n'; 
             }, '');

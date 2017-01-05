@@ -4,11 +4,14 @@ var request = require('request'),
     iconv = require('iconv-lite'),
     winston = require('winston'),
     EventEmitter = require('events'),
+    topicService = require('./topicService'),
     baseUrl = 'http://rutracker.org/forum/',
     loginUrl = baseUrl + 'login.php';
 
-function Rutracker(topicService) {
-    this.topicService = topicService;
+function Rutracker(user, password, url) {
+    this.user = user;
+    this.password = password;
+    this.url = url;
 }
 
 Rutracker.prototype = new EventEmitter();
@@ -38,7 +41,7 @@ Rutracker.prototype.fetch = function(url) {
     const me = this;
     return new Promise((resolve, reject) => {
         const options = {
-            url: url,
+            url: url || me.url,
             encoding: null,
             headers: {
                 'Cookie': me.cookie + '; opt_js={"only_new":2}'
@@ -58,17 +61,17 @@ Rutracker.prototype.fetch = function(url) {
                     topicsArray.push({title: title, href: baseUrl + href});
                 }
                 winston.debug('topicsArray: ' + JSON.stringify(topicsArray));
-                me.topicService.checkTopics(topicsArray).then(result => {
+                topicService.checkTopics(topicsArray).then(result => {
                     winston.debug('new topics: ' + JSON.stringify(result));
                     if (result && result.length > 0) {
-                        me.topicService.addTopics(result).then(() => {
+                        topicService.addTopics(result).then(() => {
                             resolve(result);
-                        }).catch(reject);
+                        });
                     }
                     else {
                         resolve(result);
                     }
-                }).catch(reject);
+                });
             } else {
                 reject(error);
             }

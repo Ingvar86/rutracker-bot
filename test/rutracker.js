@@ -3,7 +3,7 @@ var Rutracker = require('../services/rutrackerService'),
     url = 'http://rutracker.org/forum/viewforum.php?f=257';
 
 describe.skip('Test Rutracker Service', function() {
-    var rutracker = new Rutracker(url);
+    var rutracker = new Rutracker();
     it('should return topics from ' + url, function(done) {
         rutracker.fetch((data) => {
             data.should.be.Array();
