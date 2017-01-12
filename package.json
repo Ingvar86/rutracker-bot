@@ -11,6 +11,7 @@
     "mongodb": "^2.2.10",
     "node-telegram-bot-api": "^0.24.0",
     "request": "^2.75.0",
+    "sinon": "^1.17.7",
     "winston": "^2.3.0"
   },
   "devDependencies": {

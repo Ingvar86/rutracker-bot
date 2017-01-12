@@ -27,8 +27,8 @@ Rutracker.prototype.login = function(user, password) {
         }
     };
     request.post(options, function (error, response, body) {
-        if (error) {
-            me.emit('login-error', error);
+        if (error || !response.headers['set-cookie']) {
+            me.emit('login-error', error || 'login error');
         }
         else {
             me.cookie = response.headers['set-cookie'][0];
