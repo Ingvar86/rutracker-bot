@@ -4,3 +4,4 @@ typings.json
 jsconfig.json
 .eslintrc.json
 .vscode
+debug.log

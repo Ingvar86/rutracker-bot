@@ -47,7 +47,7 @@ Rutracker.prototype.fetch = function(url) {
                 'Cookie': me.cookie + '; opt_js={"only_new":2}'
             }
         };
-        request(options, function (error, response, body) {
+        request.get(options, function (error, response, body) {
             if (!error) {
                 var body1 = iconv.decode(body, 'win1251');
                 var $ = cheerio.load(body1),
@@ -61,17 +61,7 @@ Rutracker.prototype.fetch = function(url) {
                     topicsArray.push({title: title, href: baseUrl + href});
                 }
                 winston.debug('topicsArray: ' + JSON.stringify(topicsArray));
-                topicService.checkTopics(topicsArray).then(result => {
-                    winston.debug('new topics: ' + JSON.stringify(result));
-                    if (result && result.length > 0) {
-                        topicService.addTopics(result).then(() => {
-                            resolve(result);
-                        });
-                    }
-                    else {
-                        resolve(result);
-                    }
-                });
+                resolve(topicsArray);
             } else {
                 reject(error);
             }
