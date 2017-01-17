@@ -18,15 +18,16 @@ rutracker.on('login', () => {
         .then(newTopics => {
             winston.debug('new topics: ' + JSON.stringify(newTopics));
             if (newTopics && newTopics.length > 0) {
-                topicService.addTopics(newTopics).then(() => {
+                return topicService.addTopics(newTopics).then(() => {
                     var message = newTopics.reduce((prev, next) => {
                         return prev + next.title + '\n' + next.href + '\n'; 
                     }, '');
-                    bot.notifyAll(message).then(()=> {
-                        connectionService.closeConnection();
-                    });
+                    return bot.notifyAll(message);
                 });
             }
+        })
+        .then(() => {
+            connectionService.closeConnection();
         })
         .catch(error => {
             connectionService.closeConnection();
