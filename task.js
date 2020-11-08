@@ -26,13 +26,12 @@ rutracker.on('login', () => {
                 });
             }
         })
-        .then(() => {
+        .catch(error => {
+            winston.error(error);
+        })
+        .finally(() => {
             connectionService.closeConnection();
         })
-        .catch(error => {
-            connectionService.closeConnection();
-            winston.error(error);
-        });
 });
 
 rutracker.on('login-error', winston.error);

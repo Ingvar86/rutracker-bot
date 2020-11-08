@@ -1,6 +1,7 @@
 'use strict';
 var TelegramBot = require('node-telegram-bot-api');
 var chatSetvice = require('../services/chatService');
+var winston = require('winston');
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.BOT_TOKEN;
@@ -50,9 +51,13 @@ bot.onText(/\/end/, function (msg, match) {
 
 bot.notifyAll = function (massage) {
     return chatSetvice.getChats().then(chats => {
+        let promises = [];
         chats.forEach((chat) => {
-            bot.sendMessage(chat.chatId, massage);
+            promises.push(bot.sendMessage(chat.chatId, massage).catch(error => {
+                winston.error(error);
+            }));
         });
+        return Promise.allSettled(promises);
     });
 };
 
