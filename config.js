@@ -6,5 +6,5 @@ let normalaizeUrl = (url) => {
 }
 
 module.exports = {
-    rutrackerUrl: normalaizeUrl(process.env.RUTRACKER_URL) || 'https://rutracker.org/',
+    rutrackerUrl: normalaizeUrl(process.env.RUTRACKER_URL) || 'https://rutracker.net/',
 }
