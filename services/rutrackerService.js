@@ -8,6 +8,12 @@ var request = require('request'),
     baseUrl = `${config.rutrackerUrl}forum/`,
     loginUrl = baseUrl + 'login.php';
 
+let getCookie = (cookies) => {
+    return cookies.reduce((prev, curr) => {
+        return prev += curr.substring(0, curr.indexOf(';') + 1);
+    }, '');
+}
+
 function Rutracker(user, password, url) {
     this.user = user;
     this.password = password;
@@ -24,14 +30,18 @@ Rutracker.prototype.login = function(user, password) {
             login_username: user || me.user,
             login_password: password || me.password,
             login: 'Вход'
-        }
+        },
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:83.0) Gecko/20100101 Firefox/83.0',
+            'Accept-Encoding': 'gzip, deflate, br'
+        }        
     };
     request.post(options, function (error, response, body) {
         if (error || !response.headers['set-cookie']) {
             me.emit('login-error', error || 'login error');
         }
         else {
-            me.cookie = response.headers['set-cookie'][0];
+            me.cookie = getCookie(response.headers['set-cookie']);
             me.emit('login');
         }
     });    
@@ -43,8 +53,11 @@ Rutracker.prototype.fetch = function(url) {
         const options = {
             url: url || me.url,
             encoding: null,
+            gzip: true,
             headers: {
-                'Cookie': me.cookie + '; opt_js={"only_new":2}'
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Cookie': me.cookie + ' opt_js={%22only_new%22:2}',
+                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:83.0) Gecko/20100101 Firefox/83.0'
             }
         };
         request.get(options, function (error, response, body) {
