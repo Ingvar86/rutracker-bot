@@ -4,8 +4,8 @@ var request = require('request'),
     iconv = require('iconv-lite'),
     winston = require('winston'),
     EventEmitter = require('events'),
-    topicService = require('./topicService'),
-    baseUrl = 'http://rutracker.org/forum/',
+    config = require('../config'),
+    baseUrl = `${config.rutrackerUrl}forum/`,
     loginUrl = baseUrl + 'login.php';
 
 function Rutracker(user, password, url) {

@@ -4,7 +4,8 @@ var Rutracker = require('./services/rutrackerService'),
     winston = require('winston'),
     bot = require('./telegram/bot'),
     connectionService = require('./services/connectionService'),
-    url = 'http://rutracker.org/forum/viewforum.php?f=257',
+    config = require('./config'),
+    url = `${config.rutrackerUrl}forum/viewforum.php?f=257`,
     user = process.env.USER,
     password = process.env.PASSWORD;
 

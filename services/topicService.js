@@ -22,6 +22,7 @@ exports.checkTopics = function(topicsArray) {
 
 exports.addTopics = function(topics) {
     return connect.getConnection().then((db) => {
-        return db.collection('topics').insertMany(topics);
+        let dateTimeTopics = topics.map(t => t.date = new Date());
+        return db.collection('topics').insertMany(dateTimeTopics);
     });
 };
